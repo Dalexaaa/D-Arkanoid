@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://dlyfnx11ioupr"]
 
 [ext_resource type="Script" uid="uid://6bem5i57x5uw" path="res://src/managers/game_manager/main.gd" id="1_rq5ur"]
+[ext_resource type="PackedScene" uid="uid://dnr0xofpbl4ti" path="res://src/core/entities/paddle.tscn" id="2_vw0e3"]
 
 [node name="Main" type="Node2D" unique_id=382989425]
 script = ExtResource("1_rq5ur")
+
+[node name="Paddle" parent="." unique_id=1545866025 instance=ExtResource("2_vw0e3")]
+position = Vector2(360, 1100)
