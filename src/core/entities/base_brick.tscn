@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bo1x7chugjeom"]
+
+[ext_resource type="Script" uid="uid://bmpgbq341ypqr" path="res://src/core/entities/base_brick.gd" id="1_cgjtt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocpth"]
+size = Vector2(60, 20)
+
+[node name="BaseBrick" type="StaticBody2D" unique_id=537961187]
+script = ExtResource("1_cgjtt")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1388704642]
+offset_left = -30.0
+offset_top = -10.0
+offset_right = 30.0
+offset_bottom = 10.0
+color = Color(1.6364455e-06, 0.7099947, 0.079877056, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=167851060]
+shape = SubResource("RectangleShape2D_ocpth")

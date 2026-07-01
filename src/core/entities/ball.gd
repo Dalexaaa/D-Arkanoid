@@ -26,8 +26,15 @@ func _physics_process(delta: float) -> void:
 	var collision = move_and_collide(velocity * delta)
 	
 	if collision:
-		# Fórmula de reflexión física usando la normal de la superficie
+		# Rebote físico normal
 		velocity = velocity.bounce(collision.get_normal())
+		
+		# Identificamos contra qué chocamos
+		var collider = collision.get_collider()
+		
+		# Duck Typing: Si el objeto tiene la función "hit", la llamamos
+		if collider.has_method("hit"):
+			collider.hit()
 		
 	# Verificar si cayó por debajo de la pantalla (Game Over / Pierde Vida)
 	if global_position.y > _screen_height + 50:
