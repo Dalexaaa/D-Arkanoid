@@ -2,9 +2,36 @@
 
 [ext_resource type="Script" uid="uid://6bem5i57x5uw" path="res://src/managers/game_manager/main.gd" id="1_rq5ur"]
 [ext_resource type="PackedScene" uid="uid://dnr0xofpbl4ti" path="res://src/core/entities/paddle.tscn" id="2_vw0e3"]
+[ext_resource type="PackedScene" uid="uid://o8wfe35fb15t" path="res://src/core/entities/ball.tscn" id="3_kn3t6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocpth"]
+size = Vector2(20, 1280)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tc1qq"]
+size = Vector2(20, 1280)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rkhby"]
+size = Vector2(720, 20)
 
 [node name="Main" type="Node2D" unique_id=382989425]
 script = ExtResource("1_rq5ur")
 
 [node name="Paddle" parent="." unique_id=1545866025 instance=ExtResource("2_vw0e3")]
 position = Vector2(360, 1100)
+
+[node name="Borders" type="StaticBody2D" parent="." unique_id=905057915]
+
+[node name="Pared Izq" type="CollisionShape2D" parent="Borders" unique_id=229926392]
+position = Vector2(-10, 640)
+shape = SubResource("RectangleShape2D_ocpth")
+
+[node name="Pared Derecha" type="CollisionShape2D" parent="Borders" unique_id=252986811]
+position = Vector2(730, 640)
+shape = SubResource("RectangleShape2D_tc1qq")
+
+[node name="Techo" type="CollisionShape2D" parent="Borders" unique_id=192976528]
+position = Vector2(360, -10)
+shape = SubResource("RectangleShape2D_rkhby")
+
+[node name="Ball" parent="." unique_id=1002685892 instance=ExtResource("3_kn3t6")]
+position = Vector2(360, 800)
