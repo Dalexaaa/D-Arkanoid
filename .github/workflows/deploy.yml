@@ -3,51 +3,51 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 permissions:
   contents: write
 
 jobs:
-  export_web:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      # 1. Creamos un certificado de seguridad temporal (Keystore) para Android
+      - name: Generar Android Debug Keystore
+        run: |
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
+
+      # 2. Pre-calentamos la caché de Godot para evitar el error headless
+      - name: Pre-calentar Godot Cache
+        run: mkdir -p .godot/editor .godot/imported
         
-      - name: Export Web
-        id: export_web
-        uses: firebelley/godot-export@v5
+      # 3. Exportamos inyectando el certificado falso como variable de entorno
+      - name: Export All Godot Presets
+        id: export
+        uses: firebelley/godot-export@v5.2.1
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ github.workspace }}/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         with:
           godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           relative_project_path: ./
           archive_output: false
-          preset: Web
+          export_debug: true # Obligamos a que use nuestro Keystore temporal de Debug
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ steps.export_web.outputs.build_directory }}
-
-  export_android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Export Android (Debug)
-        id: export_android
-        uses: firebelley/godot-export@v5
-        with:
-          godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
-          godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
-          relative_project_path: ./
-          archive_output: false
-          preset: Android
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
         with:
           name: Arkanoid-Android
-          path: ${{ steps.export_android.outputs.build_directory }}
+          path: ${{ steps.export.outputs.build_directory }}/Android 
+
+      - name: Deploy Web to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ steps.export.outputs.build_directory }}/Web
