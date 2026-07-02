@@ -15,21 +15,35 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      # 1. Creamos un certificado de seguridad temporal (Keystore) para Android
+      - name: Generar Android Debug Keystore
+        run: |
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
+
+      # 2. Pre-calentamos la caché de Godot para evitar el error headless
+      - name: Pre-calentar Godot Cache
+        run: mkdir -p .godot/editor .godot/imported
         
+      # 3. Exportamos inyectando el certificado falso como variable de entorno
       - name: Export All Godot Presets
         id: export
         uses: firebelley/godot-export@v5.2.1
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: ${{ github.workspace }}/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         with:
           godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           relative_project_path: ./
           archive_output: false
+          export_debug: true # Obligamos a que use nuestro Keystore temporal de Debug
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
           name: Arkanoid-Android
-          # firebelley pone la exportacion dentro de una carpeta con el nombre exacto del preset
           path: ${{ steps.export.outputs.build_directory }}/Android 
 
       - name: Deploy Web to GitHub Pages
