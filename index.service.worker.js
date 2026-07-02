@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1782951404|3283232';
+const CACHE_VERSION = '1782951507|3292613';
 /** @type {string} */
 const CACHE_PREFIX = 'arkanoid-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
